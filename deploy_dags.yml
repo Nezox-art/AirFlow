@@ -1,0 +1,29 @@
+name: Deploy DAGs to Airflow VM
+
+on:
+  push:
+    branches:
+      - main  # Триггер на пуши в ветку main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install SSH Client
+        run: sudo apt-get install -y sshpass
+
+      - name: Add SSH key
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Copy DAGs to Airflow VM
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          scp -o StrictHostKeyChecking=no -r dags/* $VM_USER@$VM_HOST:~/airflow/dags/
