@@ -3,7 +3,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
-from plugins.yandex_metrika_etl import YandexMetrikaToClickHouse
+from yandex_metrika_etl import YandexMetrikaToClickHouse
 
 # Параметры
 default_args = {
