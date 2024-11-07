@@ -1,6 +1,6 @@
 from airflow.plugins_manager import AirflowPlugin
-from clickoperator.clickhouse_operator import ClickhouseExecuteOperator
-from clickoperator.clickhouse_hook import ClickhouseHook
+from plugins.clickoperator.clickhouse_operator import ClickhouseExecuteOperator
+from plugins.clickoperator.clickhouse_hook import ClickhouseHook
 
 
 class AirflowClickhousePlugin(AirflowPlugin):
