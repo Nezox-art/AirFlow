@@ -1,9 +1,12 @@
 # /Airflow/dag/yandex_to_clickhouse_dag.py
 
+import sys
+sys.path.append('/opt/airflow/plugins/')
+from export_yametrica.yandex_metrika_etl import YandexMetrikaToClickHouse
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
-from ..plugins.export_yametrica.yandex_metrika_etl import YandexMetrikaToClickHouse
+from export_yametrica.yandex_metrika_etl import YandexMetrikaToClickHouse
 
 # Параметры
 default_args = {
