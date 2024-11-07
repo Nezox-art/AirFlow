@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 
-from clickoperator.clickhouse_operator import ClickhouseExecuteOperator
+from plugins.clickoperator.clickhouse_operator import ClickhouseExecuteOperator
 from airflow.hooks.base import BaseHook
 from urllib.parse import urlencode
 import os
