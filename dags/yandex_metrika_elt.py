@@ -78,7 +78,7 @@ def failure_callback(context):
 
 # Определение DAG
 with DAG(
-    'dombook_ods_registration_agent',
+    'clickhouse_yandex_mertika',
     default_args={'retries': 1},
     description='Insert into ods.dombook_crm_registration_agents',
     schedule_interval="15 07 * * *",
