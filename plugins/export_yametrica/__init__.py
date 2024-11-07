@@ -1,5 +1,5 @@
 from airflow.plugins_manager import AirflowPlugin
-from export_yametrica.yametrica_hook import YandexMetricaHook
+from plugins.export_yametrica.yametrica_hook import YandexMetricaHook
 
 class AirflowYametricaPlugin(AirflowPlugin):
     name = "yametrica_plugin"  
