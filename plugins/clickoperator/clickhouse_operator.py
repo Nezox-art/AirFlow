@@ -1,5 +1,5 @@
 from airflow.models.baseoperator import BaseOperator
-from plugins.clickoperator.clickhouse_hook import ClickhouseHook
+from clickoperator.clickhouse_hook import ClickhouseHook
 
 
 class ClickhouseExecuteOperator(BaseOperator):
