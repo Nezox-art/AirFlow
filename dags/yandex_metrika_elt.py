@@ -5,9 +5,11 @@ from clickhouse_driver import Client
 import pandas as pd
 import requests
 import logging
+import os
 import json
 from urllib.parse import urlencode
 import io
+from airflow.configuration import conf
 
 log_mapping = {
     'hits': {
@@ -25,6 +27,32 @@ log_mapping = {
         '''
     }
 }
+
+def check_airflow_configuration():
+    try:
+        # Проверка secret_key
+        secret_key = conf.get('webserver', 'secret_key')
+        if not secret_key or secret_key == 'temporary_key':
+            raise ValueError("Secret key is not properly configured in 'airflow.cfg'. Please set a secure key.")
+
+        logging.info("Secret key configured correctly.")
+        
+        # Проверка синхронизации времени
+        import ntplib
+        from datetime import datetime
+        client = ntplib.NTPClient()
+        response = client.request('pool.ntp.org')
+        ntp_time = datetime.fromtimestamp(response.tx_time)
+        local_time = datetime.now()
+
+        if abs((ntp_time - local_time).total_seconds()) > 5:
+            raise ValueError("Time synchronization is off. Please synchronize system time.")
+        
+        logging.info("Time synchronization is correct.")
+    
+    except Exception as e:
+        logging.error(f"Configuration issue: {e}")
+        raise
 
 def get_clickhouse_client():
     return Client(host='89.169.131.57', port=8123, user='admin', password='@dmin5545', database='default')
@@ -66,7 +94,9 @@ def clean_data(request_id, yandex_metrika_token, yandex_metrika_counter_id):
     requests.post(url, headers=headers).raise_for_status()
 
 def etl_task(**kwargs):
-    logging.info(f"Starting ETL task for date: {kwargs['ds']}")
+    logging.info("Starting ETL Task")
+    check_airflow_configuration()
+    
     yandex_metrika_token = 'y0_AgAAAAAFuz4YAAyiOAAAAAEVm2J0AAArzYyUk_RG5b57qNKnt-oQVoxLBg'
     yandex_metrika_counter_id = '93714785'
     start_date = (datetime.strptime(kwargs['ds'], '%Y-%m-%d') - timedelta(days=6)).strftime('%Y-%m-%d')
@@ -78,6 +108,11 @@ def etl_task(**kwargs):
     df = download_data(request_id, yandex_metrika_token, yandex_metrika_counter_id)
     load_data_to_clickhouse(df, table_name, source)
     clean_data(request_id, yandex_metrika_token, yandex_metrika_counter_id)
+
+def on_failure_callback(context):
+    task_instance = context.get('task_instance')
+    logging.error(f"Task {task_instance.task_id} in DAG {task_instance.dag_id} failed.")
+    # Вы можете добавить код для отправки уведомления (например, в Slack или по почте)
 
 default_args = {
     'owner': 'airflow',
@@ -95,7 +130,8 @@ with DAG(
     schedule_interval="15 07 * * *",
     catchup=False,
     tags=['clickhouse', 'yandex', 'metrika'],
-    max_active_runs=1
+    max_active_runs=1,
+    on_failure_callback=on_failure_callback
 ) as dag:
     
     run_etl = PythonOperator(
