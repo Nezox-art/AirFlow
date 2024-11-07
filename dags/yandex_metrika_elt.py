@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from clickhouse_driver import Client
 import pandas as pd
 import requests
+import logging
 import json
 from urllib.parse import urlencode
 import io
@@ -65,6 +66,7 @@ def clean_data(request_id, yandex_metrika_token, yandex_metrika_counter_id):
     requests.post(url, headers=headers).raise_for_status()
 
 def etl_task(**kwargs):
+    logging.info(f"Starting ETL task for date: {kwargs['ds']}")
     yandex_metrika_token = 'y0_AgAAAAAFuz4YAAyiOAAAAAEVm2J0AAArzYyUk_RG5b57qNKnt-oQVoxLBg'
     yandex_metrika_counter_id = '93714785'
     start_date = (datetime.strptime(kwargs['ds'], '%Y-%m-%d') - timedelta(days=6)).strftime('%Y-%m-%d')
@@ -99,5 +101,5 @@ with DAG(
     run_etl = PythonOperator(
         task_id='run_etl',
         python_callable=etl_task,
-        provide_context=True
+        op_kwargs={},
     )
