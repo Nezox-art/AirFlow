@@ -4,7 +4,6 @@ import locale
 import datetime
 from datetime import date, datetime, timedelta
 import dateutil.relativedelta
-import pandasql as ps
 import clickhouse_connect
 import json
 from clickhouse_driver import Client
