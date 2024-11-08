@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 # Функция для записи данных в ClickHouse
 def insert_into_clickhouse():
     # Подключение к ClickHouse
-    client = Client(host='89.169.131.57', port=8123, user='admin', password='@dmin5545', database='default')
+    client = Client(host='89.169.131.57', port=9000, user='admin', password='@dmin5545', database='default')
 
     # Данные для вставки
     data = [
@@ -33,7 +33,7 @@ with DAG(
     'insert_clickhouse_dag',
     default_args=default_args,
     description='DAG для вставки данных в таблицу ClickHouse',
-    schedule_interval=None,  # Запуск вручную
+    schedule=None,  # Запуск вручную
     start_date=datetime(2024, 11, 8),
     catchup=False,
 ) as dag:
