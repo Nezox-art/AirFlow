@@ -11,7 +11,7 @@ from airflow.operators.python import PythonOperator
 from airflow import DAG
 
 def get_clickhouse_client():
-    return Client(host='89.169.131.57', port=9000, user='admin', password='@dmin5545', database='default')
+    return Client(host='89.169.131.57', port=8123, user='admin', password='@dmin5545', database='default')
 
 def create_metrika():
     # Подключение к ClickHouse
